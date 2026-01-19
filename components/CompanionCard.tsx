@@ -38,10 +38,11 @@ const CompanionCard = ({
         <Image src={"/icons/clock.svg"} alt="Clock" width={12} height={12} />
         <p className="text-sm"> {duration} mins duration</p>
       </div>
-      <Link href={`/companions/${id}`} className="">
-        <button className="btn-primary w-full justify-center ">
-          Launch Session
-        </button>
+      <Link
+        href={`/companions/${id}`}
+        className="btn-primary w-full justify-center"
+      >
+        Launch Session
       </Link>
     </article>
   );

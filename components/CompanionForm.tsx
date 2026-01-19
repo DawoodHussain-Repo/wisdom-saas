@@ -196,7 +196,11 @@ const CompanionForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full cursor-pointer">
+        <Button
+          type="submit"
+          className="w-full cursor-pointer"
+          isLoading={form.formState.isSubmitting}
+        >
           Build Your Companion
         </Button>
       </form>
