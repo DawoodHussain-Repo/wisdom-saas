@@ -88,36 +88,13 @@ async function SignedInDashboard() {
   );
 }
 
-function GuestHero() {
-  return (
-    <section className="flex flex-col items-center text-center gap-8 py-20">
-      <h1 className="text-5xl md:text-6xl leading-tight max-w-3xl">
-        Master Any Subject, One Conversation at a Time
-      </h1>
-      <p className="text-lg text-[var(--color-text-secondary)] max-w-xl leading-relaxed">
-        Personalized AI voice tutors that adapt to your pace. Choose a subject,
-        start talking, and learn naturally.
-      </p>
-      <div className="flex gap-4 flex-wrap justify-center">
-        <SignUpButton>
-          <button className="btn-primary text-base px-8 py-3 cursor-pointer">
-            Get Started Free
-          </button>
-        </SignUpButton>
-        <Link href="#how-it-works" className="btn-signin text-base px-8 py-3">
-          See How It Works
-          <ArrowRight size={16} />
-        </Link>
-      </div>
-    </section>
-  );
-}
+import HeroSection from "@/components/landing/HeroSection";
 
 export default async function Page() {
   return (
     <main>
       <SignedOut>
-        <GuestHero />
+        <HeroSection />
         <div id="how-it-works">
           <HowItWorks />
         </div>
