@@ -1,11 +1,11 @@
 "use client";
+
 import Image from "next/image";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-
+import { useEffect, useState } from "react";
 import { formUrlQuery, removeKeysFromUrlQuery } from "@jsmastery/utils";
 
-const SearchInput = () => {
+export default function SearchInput() {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -13,7 +13,7 @@ const SearchInput = () => {
   const [searchQuery, setSearchQuery] = useState(query);
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       if (searchQuery) {
         const newUrl = formUrlQuery({
           params: searchParams.toString(),
@@ -21,38 +21,27 @@ const SearchInput = () => {
           value: searchQuery,
         });
         router.push(newUrl, { scroll: false });
-      } else {
-        if (pathname === "/companions") {
-          const newUrl = removeKeysFromUrlQuery({
-            params: searchParams.toString(),
-            keysToRemove: ["topic"],
-          });
-          router.push(newUrl, { scroll: false });
-        }
+      } else if (pathname === "/companions") {
+        const newUrl = removeKeysFromUrlQuery({
+          params: searchParams.toString(),
+          keysToRemove: ["topic"],
+        });
+        router.push(newUrl, { scroll: false });
       }
     }, 500);
+    return () => clearTimeout(timeout);
   }, [searchQuery, searchParams, router, pathname]);
 
   return (
-    <div
-      className="rounded-lg relative h-fit px-3 py-2 gap-2 flex items-center transition-all duration-200"
-      style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border-default)",
-      }}
-    >
-      <Image src={"/icons/search.svg"} alt="Search" width={15} height={15} />
+    <div className="rounded-lg relative border border-black h-fit px-2 py-1 gap-2 flex items-center">
+      <Image src="/icons/search.svg" alt="Search" width={15} height={15} />
       <input
         type="text"
         placeholder="Search Companions ..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="outline-none bg-transparent"
-        style={{ color: "var(--text-primary)" }}
-        id="search-companions-input"
-      ></input>
+        className="outline-none"
+      />
     </div>
   );
-};
-
-export default SearchInput;
+}

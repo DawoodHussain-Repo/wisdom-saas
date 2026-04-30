@@ -1,45 +1,34 @@
 "use client";
+
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
 
-const navItemsArr = [
+const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Companions", href: "/companions" },
   { label: "My Journey", href: "/my-journey" },
-];
+] as const;
 
-const NavItems = () => {
+export default function NavItems() {
   const pathname = usePathname();
+
   return (
-    <nav className="flex items-center gap-6">
-      {navItemsArr.map((Item) => (
+    <nav className="flex items-center gap-4">
+      {NAV_ITEMS.map((item) => (
         <Link
-          key={Item.label}
-          href={Item.href}
+          key={item.label}
+          href={item.href}
           className={cn(
-            "relative py-1 text-sm font-medium transition-colors duration-200",
-            pathname === Item.href
-              ? "text-[var(--accent-amber)]"
-              : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
+            "text-sm font-medium transition-colors duration-150",
+            pathname === item.href
+              ? "text-[var(--color-accent)] font-semibold"
+              : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]",
           )}
-          style={{ fontFamily: "'Inter', sans-serif" }}
         >
-          {Item.label}
-          {pathname === Item.href && (
-            <span
-              className="absolute -bottom-1 left-0 w-full h-0.5 rounded-full"
-              style={{
-                background: "var(--accent-amber)",
-                boxShadow: "0 0 8px var(--accent-amber-glow)",
-              }}
-            />
-          )}
+          {item.label}
         </Link>
       ))}
     </nav>
   );
-};
-
-export default NavItems;
+}
