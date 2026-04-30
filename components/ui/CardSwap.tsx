@@ -1,5 +1,5 @@
 "use client";
-import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef, ReactNode, ReactElement } from 'react';
+import React, { Children, forwardRef, isValidElement, useEffect, useMemo, useRef, ReactNode, ReactElement } from 'react';
 import gsap from 'gsap';
 import './CardSwap.css';
 
@@ -75,28 +75,9 @@ const CardSwap: React.FC<CardSwapProps> = ({
   easing = 'elastic',
   children
 }) => {
-  const config: AnimationConfig =
-    easing === 'elastic'
-      ? {
-          ease: 'elastic.out(0.6,0.9)',
-          durDrop: 2,
-          durMove: 2,
-          durReturn: 2,
-          promoteOverlap: 0.9,
-          returnDelay: 0.05
-        }
-      : {
-          ease: 'power1.inOut',
-          durDrop: 0.8,
-          durMove: 0.8,
-          durReturn: 0.8,
-          promoteOverlap: 0.45,
-          returnDelay: 0.2
-        };
-
   const childArr = useMemo(() => Children.toArray(children), [children]);
   const refs = useMemo(
-    () => childArr.map(() => React.createRef<HTMLDivElement>()),
+    () => Array.from({ length: childArr.length }, () => React.createRef<HTMLDivElement>()),
     [childArr.length]
   );
 
@@ -107,6 +88,25 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const config: AnimationConfig =
+      easing === 'elastic'
+        ? {
+            ease: 'elastic.out(0.6,0.9)',
+            durDrop: 2,
+            durMove: 2,
+            durReturn: 2,
+            promoteOverlap: 0.9,
+            returnDelay: 0.05
+          }
+        : {
+            ease: 'power1.inOut',
+            durDrop: 0.8,
+            durMove: 0.8,
+            durReturn: 0.8,
+            promoteOverlap: 0.45,
+            returnDelay: 0.2
+          };
+
     const total = refs.length;
     refs.forEach((r, i) => placeNow(r.current, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
 
@@ -193,25 +193,30 @@ const CardSwap: React.FC<CardSwapProps> = ({
       };
     }
     return () => clearInterval(intervalRef.current);
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, refs, config]);
-
-  const rendered = childArr.map((child, i) =>
-    isValidElement(child)
-      ? cloneElement(child as ReactElement<CardProps>, {
-          key: i,
-          ref: refs[i],
-          style: { width, height, ...(child.props.style ?? {}) },
-          onClick: (e: React.MouseEvent<HTMLDivElement>) => {
-            child.props.onClick?.(e);
-            onCardClick?.(i);
-          }
-        })
-      : child
-  );
+  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, refs]);
 
   return (
     <div ref={container} className="card-swap-container" style={{ width, height }}>
-      {rendered}
+      {childArr.map((child, i) => {
+        if (!isValidElement(child)) return child;
+        
+        const element = child as ReactElement<CardProps>;
+        const originalStyle = element.props.style || {};
+        const originalOnClick = element.props.onClick;
+        
+        return (
+          <Card
+            key={i}
+            ref={refs[i]}
+            {...element.props}
+            style={{ width, height, ...originalStyle }}
+            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+              originalOnClick?.(e);
+              onCardClick?.(i);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
