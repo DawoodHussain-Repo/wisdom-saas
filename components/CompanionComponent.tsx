@@ -4,11 +4,11 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { cn, configureAssistant, getSubjectColor } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
+import Link from "next/link";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
 import soundwaves from "@/constants/soundwaves.json";
 import { addToSessionHistory } from "@/lib/actions/companion.actions";
-import { Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Loader2, Clock, CheckCircle2, ArrowLeft } from "lucide-react";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -17,7 +17,28 @@ enum CallStatus {
   FINISHED = "FINISHED",
 }
 
-const CompanionComponent = ({
+const WARNING_THRESHOLD_SECONDS = 120;
+const CRITICAL_THRESHOLD_SECONDS = 30;
+
+function formatTimer(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}m ${s}s`;
+}
+
+function getTimerStatus(seconds: number): string {
+  if (seconds <= CRITICAL_THRESHOLD_SECONDS) return "critical";
+  if (seconds <= WARNING_THRESHOLD_SECONDS) return "warning";
+  return "";
+}
+
+export default function CompanionComponent({
   companionId,
   subject,
   topic,
@@ -27,75 +48,52 @@ const CompanionComponent = ({
   style,
   voice,
   duration,
-}: CompanionComponentProps) => {
+}: CompanionComponentProps) {
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
-
-  // Timer state
   const [secondsRemaining, setSecondsRemaining] = useState(duration * 60);
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Session complete state
   const [showComplete, setShowComplete] = useState(false);
   const [sessionDuration, setSessionDuration] = useState(0);
 
   const lottieRef = useRef<LottieRefCurrentProps>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Lottie animation control
   useEffect(() => {
-    if (lottieRef) {
-      if (isSpeaking) {
-        lottieRef.current?.play();
-      } else {
-        lottieRef.current?.stop();
-      }
-    }
-  }, [isSpeaking, lottieRef]);
+    if (isSpeaking) lottieRef.current?.play();
+    else lottieRef.current?.stop();
+  }, [isSpeaking]);
 
-  // Cleanup timer on unmount
   useEffect(() => {
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
 
-  // Handle session completion
   const handleSessionComplete = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
 
-    // Calculate actual session duration
     if (sessionStartTime) {
-      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-      setSessionDuration(elapsed);
+      setSessionDuration(Math.floor((Date.now() - sessionStartTime) / 1000));
     }
 
     setCallStatus(CallStatus.FINISHED);
     setShowComplete(true);
     addToSessionHistory(companionId);
 
-    // Stop VAPI if still running
-    try {
-      vapi.stop();
-    } catch {
-      // Already stopped
-    }
+    try { vapi.stop(); } catch { /* already stopped */ }
   }, [sessionStartTime, companionId]);
 
-  // Timer countdown
   useEffect(() => {
     if (callStatus === CallStatus.ACTIVE && !timerRef.current) {
       timerRef.current = setInterval(() => {
         setSecondsRemaining((prev) => {
           if (prev <= 1) {
-            // Time's up — end session gracefully
             handleSessionComplete();
             return 0;
           }
@@ -110,7 +108,6 @@ const CompanionComponent = ({
     }
   }, [callStatus, handleSessionComplete]);
 
-  // VAPI event listeners
   useEffect(() => {
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
@@ -119,23 +116,22 @@ const CompanionComponent = ({
     };
 
     const onCallEnd = () => {
-      if (callStatus !== CallStatus.FINISHED) {
-        handleSessionComplete();
-      }
+      if (callStatus !== CallStatus.FINISHED) handleSessionComplete();
     };
 
     const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
-        const newMessage = { role: message.role, content: message.transcript };
-        setMessages((prev) => [newMessage, ...prev]);
+        setMessages((prev) => [
+          { role: message.role, content: message.transcript },
+          ...prev,
+        ]);
       }
     };
 
     const onSpeechStart = () => setIsSpeaking(true);
     const onSpeechEnd = () => setIsSpeaking(false);
-
     const onError = (error: Error) => {
-      console.log("Error", error);
+      console.error("Vapi error:", error);
       setCallStatus(CallStatus.INACTIVE);
     };
 
@@ -158,9 +154,9 @@ const CompanionComponent = ({
   }, [companionId, duration, handleSessionComplete]);
 
   const toggleMicrophone = () => {
-    const isMuted = vapi.isMuted();
-    vapi.setMuted(!isMuted);
-    setIsMuted(!isMuted);
+    const muted = vapi.isMuted();
+    vapi.setMuted(!muted);
+    setIsMuted(!muted);
   };
 
   const handleCall = async () => {
@@ -168,63 +164,28 @@ const CompanionComponent = ({
     setShowComplete(false);
     setMessages([]);
 
-    const assistantOverrides = {
+    // @ts-expect-error - vapi types mismatch
+    vapi.start(configureAssistant(voice, style, duration), {
       variableValues: { subject, topic, style },
       clientMessages: ["transcript"],
       serverMessages: [],
-    };
-
-    // @ts-expect-error - vapi types mismatch
-    vapi.start(configureAssistant(voice, style, duration), assistantOverrides);
+    });
   };
 
-  const handleDisconnect = () => {
-    handleSessionComplete();
+  const resetSession = () => {
+    setShowComplete(false);
+    setCallStatus(CallStatus.INACTIVE);
+    setSecondsRemaining(duration * 60);
   };
-
-  // Format time as MM:SS
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
-  // Format session duration as Xm Ys
-  const formatSessionDuration = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}m ${s}s`;
-  };
-
-  // Timer status
-  const timerStatus =
-    secondsRemaining <= 30
-      ? "critical"
-      : secondsRemaining <= 120
-        ? "warning"
-        : "";
 
   return (
     <>
       <section className="flex flex-col h-[70vh]">
-        {/* Timer bar — visible during active session */}
         {callStatus === CallStatus.ACTIVE && (
-          <div className="flex justify-center mb-4 animate-fadeInUp">
-            <div className={`session-timer ${timerStatus}`}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-              {formatTime(secondsRemaining)} remaining
+          <div className="flex justify-center mb-4">
+            <div className={`session-timer ${getTimerStatus(secondsRemaining)}`}>
+              <Clock size={14} />
+              {formatTimer(secondsRemaining)} remaining
             </div>
           </div>
         )}
@@ -238,12 +199,8 @@ const CompanionComponent = ({
               <div
                 className={cn(
                   "absolute transition-opacity duration-1000",
-                  callStatus === CallStatus.FINISHED ||
-                    callStatus === CallStatus.INACTIVE
-                    ? "opacity-100"
-                    : "opacity-0",
-                  callStatus === CallStatus.CONNECTING &&
-                    "opacity-100 animate-pulse",
+                  callStatus === CallStatus.ACTIVE ? "opacity-0" : "opacity-100",
+                  callStatus === CallStatus.CONNECTING && "animate-pulse",
                 )}
               >
                 <Image
@@ -269,12 +226,7 @@ const CompanionComponent = ({
                 />
               </div>
             </div>
-            <p
-              className="font-bold text-2xl"
-              style={{ color: "var(--text-primary)" }}
-            >
-              {name}
-            </p>
+            <p className="font-bold text-2xl">{name}</p>
           </div>
 
           <div className="user-section">
@@ -286,46 +238,35 @@ const CompanionComponent = ({
                 height={130}
                 className="rounded-lg"
               />
-              <p
-                className="font-bold text-2xl"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {userName}
-              </p>
+              <p className="font-bold text-2xl">{userName}</p>
             </div>
             <button
               className="btn-mic"
               onClick={toggleMicrophone}
               disabled={callStatus !== CallStatus.ACTIVE}
-              id="toggle-microphone"
             >
               <Image
                 src={isMuted ? "/icons/mic-off.svg" : "/icons/mic-on.svg"}
-                alt="mic"
+                alt="Microphone toggle"
                 width={36}
                 height={36}
               />
-              <p className="max-sm:hidden" style={{ color: "var(--text-secondary)" }}>
+              <p className="max-sm:hidden">
                 {isMuted ? "Turn on microphone" : "Turn off microphone"}
               </p>
             </button>
             <button
               className={cn(
-                "rounded-lg py-2.5 cursor-pointer transition-all duration-200 w-full text-white flex items-center justify-center gap-2 font-medium",
-                callStatus === CallStatus.ACTIVE
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "btn-primary justify-center",
+                "rounded-lg py-2 cursor-pointer transition-colors w-full text-white flex items-center justify-center gap-2",
+                callStatus === CallStatus.ACTIVE ? "bg-red-700" : "bg-primary",
                 callStatus === CallStatus.CONNECTING && "opacity-80 cursor-wait",
               )}
-              onClick={
-                callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall
-              }
+              onClick={callStatus === CallStatus.ACTIVE ? handleSessionComplete : handleCall}
               disabled={callStatus === CallStatus.CONNECTING}
-              id="session-control-button"
             >
               {callStatus === CallStatus.CONNECTING ? (
                 <>
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="animate-spin" size={18} />
                   Connecting...
                 </>
               ) : callStatus === CallStatus.ACTIVE ? (
@@ -341,121 +282,58 @@ const CompanionComponent = ({
 
         <section className="transcript">
           <div className="transcript-message no-scrollbar">
-            {messages.map((message, index) => {
-              if (message.role === "assistant") {
-                return (
-                  <p key={index} className="max-sm:text-sm">
-                    <span style={{ color: "var(--accent-amber)" }}>
-                      {name.split(" ")[0].replace("/[.,]/g, ", "")}:
-                    </span>{" "}
-                    {message.content}
-                  </p>
-                );
-              } else {
-                return (
-                  <p
-                    key={index}
-                    className="max-sm:text-sm"
-                    style={{ color: "var(--accent-violet)" }}
-                  >
-                    <span className="font-semibold">{userName}:</span>{" "}
-                    {message.content}
-                  </p>
-                );
-              }
-            })}
+            {messages.map((message, index) => (
+              <p
+                key={index}
+                className={cn(
+                  "max-sm:text-sm",
+                  message.role === "user" && "text-[var(--color-accent)]",
+                )}
+              >
+                <span className="font-semibold">
+                  {message.role === "assistant"
+                    ? name.split(" ")[0].replace(/[.,]/g, "")
+                    : userName}
+                  :
+                </span>{" "}
+                {message.content}
+              </p>
+            ))}
           </div>
-
           <div className="transcript-fade" />
         </section>
       </section>
 
-      {/* Session Complete Overlay */}
       {showComplete && (
-        <div className="session-complete-overlay" id="session-complete-overlay">
+        <div className="session-complete-overlay">
           <div className="session-complete-card">
-            {/* Success icon */}
-            <div
-              className="flex items-center justify-center rounded-full size-16"
-              style={{
-                background: "rgba(34, 197, 94, 0.1)",
-                border: "2px solid rgba(34, 197, 94, 0.3)",
-              }}
-            >
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#22c55e"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </div>
+            <CheckCircle2 size={48} className="text-green-600" />
+            <h2 className="text-2xl">Session Complete!</h2>
 
-            <h2
-              className="text-2xl font-bold"
-              style={{
-                fontFamily: "'Bricolage Grotesque', sans-serif",
-                color: "var(--text-primary)",
-              }}
-            >
-              Session Complete!
-            </h2>
-
-            <div
-              className="flex gap-8"
-              style={{ color: "var(--text-secondary)" }}
-            >
+            <div className="flex gap-8">
               <div className="flex flex-col items-center gap-1">
-                <span
-                  className="text-xl font-bold"
-                  style={{ color: "var(--accent-amber)" }}
-                >
-                  {formatSessionDuration(sessionDuration)}
+                <span className="text-xl font-bold text-[var(--color-accent)]">
+                  {formatDuration(sessionDuration)}
                 </span>
-                <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-                  Duration
-                </span>
+                <span className="text-sm text-[var(--color-text-muted)]">Duration</span>
               </div>
               <div className="flex flex-col items-center gap-1">
-                <span
-                  className="text-xl font-bold"
-                  style={{ color: "var(--accent-violet)" }}
-                >
-                  {messages.length}
-                </span>
-                <span className="text-sm" style={{ color: "var(--text-muted)" }}>
-                  Messages
-                </span>
+                <span className="text-xl font-bold">{messages.length}</span>
+                <span className="text-sm text-[var(--color-text-muted)]">Messages</span>
               </div>
             </div>
 
-            <p style={{ color: "var(--text-secondary)" }}>
-              Great session on <strong>{topic}</strong>! Keep the momentum going.
+            <p className="text-[var(--color-text-secondary)]">
+              Great session on <strong>{topic}</strong>. Keep it up!
             </p>
 
             <div className="flex gap-3 w-full">
-              <button
-                onClick={() => {
-                  setShowComplete(false);
-                  setCallStatus(CallStatus.INACTIVE);
-                  setSecondsRemaining(duration * 60);
-                }}
-                className="btn-primary flex-1 justify-center"
-                id="start-new-session"
-              >
+              <button onClick={resetSession} className="btn-primary flex-1 justify-center">
                 New Session
               </button>
-              <Link
-                href="/companions"
-                className="btn-signin flex-1 justify-center text-center"
-                id="back-to-library"
-              >
-                Back to Library
+              <Link href="/companions" className="btn-signin flex-1 justify-center text-center">
+                <ArrowLeft size={14} />
+                Library
               </Link>
             </div>
           </div>
@@ -463,6 +341,4 @@ const CompanionComponent = ({
       )}
     </>
   );
-};
-
-export default CompanionComponent;
+}

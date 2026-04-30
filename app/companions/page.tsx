@@ -3,13 +3,14 @@ import SearchInput from "@/components/SearchInput";
 import SubjectFilter from "@/components/SubjectFilter";
 import { getAllCompanions } from "@/lib/actions/companion.actions";
 import { getSubjectColor } from "@/lib/utils";
-import React from "react";
+import { Search } from "lucide-react";
 
-const CompanionLibrary = async ({ searchParams }: SearchParams) => {
+export default async function CompanionLibrary({ searchParams }: SearchParams) {
   const filters = await searchParams;
   const subject = filters.subject ? filters.subject : "";
   const topic = filters.topic ? filters.topic : "";
   const companions = await getAllCompanions({ subject, topic });
+
   return (
     <main>
       <section className="flex justify-between gap-4 max-sm:flex-col items-center">
@@ -32,23 +33,8 @@ const CompanionLibrary = async ({ searchParams }: SearchParams) => {
             />
           ))
         ) : (
-          <div
-            className="flex flex-col items-center justify-center w-full py-20 gap-4"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
+          <div className="flex flex-col items-center justify-center w-full py-20 gap-4 text-[var(--color-text-muted)]">
+            <Search size={40} strokeWidth={1.5} />
             <p className="text-lg">No companions found</p>
             <p className="text-sm">Try adjusting your search or filter</p>
           </div>
@@ -56,6 +42,4 @@ const CompanionLibrary = async ({ searchParams }: SearchParams) => {
       </section>
     </main>
   );
-};
-
-export default CompanionLibrary;
+}
