@@ -11,7 +11,7 @@ export const getSubjectColor = (subject: string) => {
   return subjectsColors[subject as keyof typeof subjectsColors];
 };
 
-export const configureAssistant = (voice: string, style: string) => {
+export const configureAssistant = (voice: string, style: string, duration: number) => {
   const voiceId = voices[voice as keyof typeof voices][
           style as keyof (typeof voices)[keyof typeof voices]
           ] || "sarah";
@@ -50,10 +50,12 @@ export const configureAssistant = (voice: string, style: string) => {
                     Keep your style of conversation {{ style }}.
                     Keep your responses short, like in a real voice conversation.
                     Do not include any special characters in your responses - this is a voice conversation.
+                    The session is ${duration} minutes long. When the session is nearing the end, wrap up the topic and summarize key takeaways.
               `,
         },
       ],
     },
+    maxDurationSeconds: duration * 60,
     clientMessages: undefined,
     serverMessages: undefined,
   };
