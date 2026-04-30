@@ -20,10 +20,26 @@ const CompanionCard = ({
   color,
 }: CompanionCardProps) => {
   return (
-    <article className="companion-card " style={{ backgroundColor: color }}>
+    <article className="companion-card" id={`companion-card-${id}`}>
+      {/* Color accent bar */}
+      <div
+        className="absolute top-0 left-0 w-full h-1 rounded-t-2xl"
+        style={{ background: color }}
+      />
+
       <div className="flex justify-between items-center">
-        <div className="subject-badge">{subject}</div>
-        <button className="companion-bookmark">
+        <div
+          className="subject-badge"
+          style={{
+            background: `${color}20`,
+            color: color,
+            borderColor: `${color}40`,
+            border: `1px solid ${color}40`,
+          }}
+        >
+          {subject}
+        </div>
+        <button className="companion-bookmark" aria-label="Bookmark companion">
           <Image
             src={`/icons/bookmark.svg`}
             alt="Bookmark"
@@ -32,15 +48,20 @@ const CompanionCard = ({
           />
         </button>
       </div>
-      <h2 className="text-2xl font-bold">{name}</h2>
-      <p className="text-sm">{topic}</p>
-      <div className="items-center flex gap-2">
+      <h2 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+        {name}
+      </h2>
+      <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+        {topic}
+      </p>
+      <div className="items-center flex gap-2" style={{ color: "var(--text-muted)" }}>
         <Image src={"/icons/clock.svg"} alt="Clock" width={12} height={12} />
-        <p className="text-sm"> {duration} mins duration</p>
+        <p className="text-sm">{duration} mins</p>
       </div>
       <Link
         href={`/companions/${id}`}
         className="btn-primary w-full justify-center"
+        id={`launch-session-${id}`}
       >
         Launch Session
       </Link>
