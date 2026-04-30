@@ -164,12 +164,13 @@ export default function CompanionComponent({
     setShowComplete(false);
     setMessages([]);
 
-    // @ts-expect-error - vapi types mismatch
-    vapi.start(configureAssistant(voice, style, duration), {
+    const overrides = {
       variableValues: { subject, topic, style },
-      clientMessages: ["transcript"],
-      serverMessages: [],
-    });
+      clientMessages: ["transcript"] as const,
+      serverMessages: [] as const,
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vapi.start(configureAssistant(voice, style, duration), overrides as any);
   };
 
   const resetSession = () => {

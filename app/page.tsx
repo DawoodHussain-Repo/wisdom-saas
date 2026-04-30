@@ -7,7 +7,6 @@ import SubjectShowcase from "@/components/landing/SubjectShowcase";
 import Pricing from "@/components/landing/Pricing";
 import CompanionsList from "@/components/CompanionsList";
 import {
-  getRecentSessions,
   getUserCompanions,
   getUserSessions,
 } from "@/lib/actions/companion.actions";
