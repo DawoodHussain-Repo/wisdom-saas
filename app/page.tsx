@@ -92,7 +92,7 @@ import HeroSection from "@/components/landing/HeroSection";
 
 export default async function Page() {
   return (
-    <main>
+    <main className="bg-doodle min-h-screen">
       <SignedOut>
         <HeroSection />
         <div id="how-it-works">
