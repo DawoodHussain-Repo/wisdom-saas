@@ -10,6 +10,7 @@ import {
   getUserCompanions,
   getUserSessions,
 } from "@/lib/actions/companion.actions";
+import EducationalDoodles from "@/components/landing/EducationalDoodles";
 
 async function SignedInDashboard() {
   const user = await currentUser();
@@ -92,8 +93,9 @@ import HeroSection from "@/components/landing/HeroSection";
 
 export default async function Page() {
   return (
-    <main className="bg-doodle min-h-screen">
+    <main className="min-h-screen relative isolate">
       <SignedOut>
+        <EducationalDoodles />
         <HeroSection />
         <div id="how-it-works">
           <HowItWorks />

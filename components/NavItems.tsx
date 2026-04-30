@@ -14,21 +14,24 @@ export default function NavItems() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-4">
-      {NAV_ITEMS.map((item) => (
-        <Link
-          key={item.label}
-          href={item.href}
-          className={cn(
-            "text-sm font-medium transition-colors duration-150",
-            pathname === item.href
-              ? "text-[var(--color-accent)] font-semibold"
-              : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]",
-          )}
-        >
-          {item.label}
-        </Link>
-      ))}
+    <nav className="flex items-center gap-1 bg-[var(--color-bg-subtle)] p-1 rounded-full border border-[var(--color-border)] max-md:hidden">
+      {NAV_ITEMS.map((item) => {
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.label}
+            href={item.href}
+            className={cn(
+              "text-sm font-medium transition-all duration-300 px-4 py-1.5 rounded-full relative",
+              isActive
+                ? "text-black shadow-sm bg-white border border-[var(--color-border)]"
+                : "text-[var(--color-text-secondary)] hover:text-black",
+            )}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

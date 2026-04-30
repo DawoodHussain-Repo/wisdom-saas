@@ -15,11 +15,19 @@ export default function Navbar() {
         <NavItems />
         <SignedOut>
           <SignInButton>
-            <button className="btn-signin">Sign In</button>
+            <button className="bg-black text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-[var(--color-accent)] transition-colors duration-200 cursor-pointer">
+              Sign In
+            </button>
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "w-9 h-9 border-2 border-transparent hover:border-[var(--color-accent)] transition-all",
+              },
+            }}
+          />
         </SignedIn>
       </div>
     </nav>
