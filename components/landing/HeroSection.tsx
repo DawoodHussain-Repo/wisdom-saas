@@ -29,40 +29,40 @@ const SUBJECT_CARDS = [
 
 export default function HeroSection() {
   return (
-    <section className="flex flex-col lg:flex-row items-center justify-between gap-12 py-20 max-w-[1200px] mx-auto w-full">
+    <section className="flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 py-12 md:py-16 lg:py-20 max-w-[1200px] mx-auto w-full px-4 md:px-0">
       {/* Left Content */}
-      <div className="flex flex-col text-left gap-8 max-w-2xl flex-1">
-        <div className="inline-flex w-fit items-center gap-2 px-3 py-1 rounded-full border border-black bg-white text-sm font-semibold mb-2">
+      <div className="flex flex-col text-left gap-6 md:gap-8 max-w-2xl flex-1 w-full">
+        <div className="inline-flex w-fit items-center gap-2 px-3 py-1.5 rounded-full border border-black bg-white text-xs md:text-sm font-semibold">
           <span className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse" aria-hidden="true" />
           Converso 2.0 is Here
         </div>
         
-        <h1 className="text-5xl md:text-7xl leading-[1.1]">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.1]">
           Master Any Subject, One Conversation at a Time
         </h1>
         
-        <p className="text-xl text-[var(--color-text-secondary)] leading-relaxed">
+        <p className="text-base sm:text-lg md:text-xl text-[var(--color-text-secondary)] leading-relaxed">
           Personalized AI voice tutors that adapt to your pace. Choose a subject,
           start talking, and learn naturally through voice interaction.
         </p>
         
-        <div className="flex gap-4 flex-wrap mt-2">
+        <div className="flex gap-3 md:gap-4 flex-wrap mt-2">
           <SignUpButton>
-            <button className="btn-primary text-lg px-8 py-4 cursor-pointer">
+            <button className="btn-primary text-base md:text-lg px-6 md:px-8 py-3 md:py-4 cursor-pointer">
               Get Started Free
             </button>
           </SignUpButton>
-          <Link href="#how-it-works" className="btn-signin text-lg px-8 py-4">
+          <Link href="#how-it-works" className="btn-signin text-base md:text-lg px-6 md:px-8 py-3 md:py-4">
             See How It Works
             <ArrowRight size={20} />
           </Link>
         </div>
         
-        <div className="flex items-center gap-4 mt-6 text-sm text-[var(--color-text-muted)]">
+        <div className="flex items-center gap-3 md:gap-4 mt-4 md:mt-6 text-xs sm:text-sm text-[var(--color-text-muted)]">
           <div className="flex -space-x-2" aria-hidden="true">
-            <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white" />
-            <div className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white" />
-            <div className="w-8 h-8 rounded-full bg-gray-400 border-2 border-white" />
+            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-200 border-2 border-white" />
+            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-300 border-2 border-white" />
+            <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-400 border-2 border-white" />
           </div>
           <p>Join 10,000+ learners today</p>
         </div>
