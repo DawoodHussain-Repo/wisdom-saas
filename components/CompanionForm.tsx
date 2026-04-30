@@ -59,13 +59,18 @@ const CompanionForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 glass-panel p-8"
+      >
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Companion name</FormLabel>
+              <FormLabel style={{ color: "var(--text-secondary)" }}>
+                Companion name
+              </FormLabel>
               <FormControl>
                 <Input
                   placeholder="Enter the companion name"
@@ -82,7 +87,9 @@ const CompanionForm = () => {
           name="subject"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Subject</FormLabel>
+              <FormLabel style={{ color: "var(--text-secondary)" }}>
+                Subject
+              </FormLabel>
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
@@ -92,7 +99,12 @@ const CompanionForm = () => {
                   <SelectTrigger className="input capitalize">
                     <SelectValue placeholder="Select the subject" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent
+                    style={{
+                      background: "var(--bg-secondary)",
+                      border: "1px solid var(--border-default)",
+                    }}
+                  >
                     {subjects.map((subject) => (
                       <SelectItem
                         value={subject}
@@ -114,7 +126,9 @@ const CompanionForm = () => {
           name="topic"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>What should the companion help with?</FormLabel>
+              <FormLabel style={{ color: "var(--text-secondary)" }}>
+                What should the companion help with?
+              </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Ex. Derivates & Integrals"
@@ -127,63 +141,81 @@ const CompanionForm = () => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="voice"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Voice</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="input">
-                    <SelectValue placeholder="Select the voice" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="style"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Style</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger className="input">
-                    <SelectValue placeholder="Select the style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="formal">Formal</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="voice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel style={{ color: "var(--text-secondary)" }}>
+                  Voice
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="input">
+                      <SelectValue placeholder="Select the voice" />
+                    </SelectTrigger>
+                    <SelectContent
+                      style={{
+                        background: "var(--bg-secondary)",
+                        border: "1px solid var(--border-default)",
+                      }}
+                    >
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="style"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel style={{ color: "var(--text-secondary)" }}>
+                  Style
+                </FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger className="input">
+                      <SelectValue placeholder="Select the style" />
+                    </SelectTrigger>
+                    <SelectContent
+                      style={{
+                        background: "var(--bg-secondary)",
+                        border: "1px solid var(--border-default)",
+                      }}
+                    >
+                      <SelectItem value="formal">Formal</SelectItem>
+                      <SelectItem value="casual">Casual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
           name="duration"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Estimated session duration in minutes</FormLabel>
+              <FormLabel style={{ color: "var(--text-secondary)" }}>
+                Session duration (minutes)
+              </FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -198,7 +230,7 @@ const CompanionForm = () => {
         />
         <Button
           type="submit"
-          className="w-full cursor-pointer"
+          className="w-full cursor-pointer btn-primary justify-center text-base py-3"
           isLoading={form.formState.isSubmitting}
         >
           Build Your Companion
