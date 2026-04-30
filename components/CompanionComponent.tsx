@@ -181,15 +181,16 @@ export default function CompanionComponent({
 
   return (
     <>
-      <section className="flex flex-col h-[70vh]">
-        {callStatus === CallStatus.ACTIVE && (
-          <div className="flex justify-center mb-4">
-            <div className={`session-timer ${getTimerStatus(secondsRemaining)}`}>
-              <Clock size={14} />
-              {formatTimer(secondsRemaining)} remaining
-            </div>
+      <section className="flex flex-col flex-1 min-h-0 w-full max-w-5xl mx-auto">
+        <div className={cn(
+          "flex justify-center mb-4 transition-all duration-300", 
+          callStatus === CallStatus.ACTIVE ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}>
+          <div className={`session-timer ${getTimerStatus(secondsRemaining)}`}>
+            <Clock size={14} />
+            {formatTimer(secondsRemaining)} remaining
           </div>
-        )}
+        </div>
 
         <section className="flex gap-8 max-sm:flex-col">
           <div className="companion-section">

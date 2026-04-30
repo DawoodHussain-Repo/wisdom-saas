@@ -11,14 +11,25 @@ const STEPS = [
     title: "Create Your Companion",
     description: "Pick a subject, set a topic, choose voice and teaching style.",
     mockup: (
-      <div className="flex flex-col gap-3 h-full justify-center">
-        <div className="w-full h-8 bg-[var(--color-bg-subtle)] rounded-md border border-[var(--color-border)] animate-pulse" />
-        <div className="w-3/4 h-8 bg-[var(--color-bg-subtle)] rounded-md border border-[var(--color-border)] animate-pulse delay-75" />
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          <div className="w-full h-10 bg-white border border-[var(--color-border-strong)] rounded-md" />
-          <div className="w-full h-10 bg-white border border-[var(--color-border-strong)] rounded-md" />
+      <div className="flex flex-col gap-3 h-full justify-center w-full max-w-sm mx-auto">
+        <h4 className="text-sm font-bold text-[var(--color-text-secondary)] mb-2 uppercase tracking-wide">Companion Builder</h4>
+        <div className="w-full bg-[var(--color-bg-subtle)] rounded-lg border border-[var(--color-border)] p-4 flex flex-col gap-2">
+          <div className="text-xs font-semibold">Subject & Topic</div>
+          <div className="w-full h-8 bg-white rounded border border-[var(--color-border)] flex items-center px-3 text-sm text-[var(--color-text-muted)]">Advanced Calculus...</div>
         </div>
-        <div className="w-full h-12 bg-[var(--color-primary)] rounded-md mt-4 shadow-sm" />
+        <div className="grid grid-cols-2 gap-2 mt-2">
+          <div className="w-full bg-white border border-[var(--color-border-strong)] rounded-lg p-3 flex flex-col gap-1 text-center">
+            <span className="text-xs font-bold">Voice</span>
+            <span className="text-xs text-[var(--color-text-muted)]">British Female</span>
+          </div>
+          <div className="w-full bg-white border border-[var(--color-border-strong)] rounded-lg p-3 flex flex-col gap-1 text-center">
+            <span className="text-xs font-bold">Style</span>
+            <span className="text-xs text-[var(--color-text-muted)]">Formal Tutor</span>
+          </div>
+        </div>
+        <div className="w-full h-12 bg-[var(--color-primary)] text-white font-semibold flex items-center justify-center rounded-lg mt-2 shadow-sm">
+          Create Companion
+        </div>
       </div>
     ),
   },
@@ -28,23 +39,30 @@ const STEPS = [
     description: "Have a real-time conversation with your personal AI tutor.",
     mockup: (
       <div className="flex flex-col h-full items-center justify-center gap-6">
-        <div className="relative">
+        <div className="text-center">
+          <h4 className="font-bold text-lg">Dr. Mathematics</h4>
+          <p className="text-sm text-[var(--color-text-secondary)]">Active Session • 04:23</p>
+        </div>
+        <div className="relative my-4">
           <div className="absolute inset-0 bg-[var(--color-accent)] opacity-20 rounded-full animate-ping" />
-          <div className="w-24 h-24 bg-[var(--color-accent)] rounded-full flex items-center justify-center z-10 relative">
+          <div className="w-24 h-24 bg-[var(--color-accent)] rounded-full flex items-center justify-center z-10 relative shadow-lg">
             <Mic size={32} color="white" />
           </div>
         </div>
-        <div className="flex gap-1 items-center justify-center h-8">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="w-2 bg-[var(--color-text)] rounded-full animate-pulse"
-              style={{
-                height: `${Math.max(20, Math.random() * 100)}%`,
-                animationDelay: `${i * 0.1}s`,
-              }}
-            />
-          ))}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex gap-1 items-center justify-center h-8">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="w-2 bg-[var(--color-text)] rounded-full animate-pulse"
+                style={{
+                  height: `${Math.max(20, Math.random() * 100)}%`,
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              />
+            ))}
+          </div>
+          <span className="text-xs font-medium text-[var(--color-text-muted)]">Listening...</span>
         </div>
       </div>
     ),
@@ -54,19 +72,27 @@ const STEPS = [
     title: "Track Your Progress",
     description: "Review sessions, bookmark favorites, build your library.",
     mockup: (
-      <div className="flex flex-col h-full justify-center gap-4">
+      <div className="flex flex-col h-full justify-center gap-4 w-full max-w-sm mx-auto">
+        <h4 className="text-sm font-bold text-[var(--color-text-secondary)] mb-1 uppercase tracking-wide">Your Journey</h4>
         <div className="flex gap-4">
-          <div className="flex-1 h-20 bg-white border border-[var(--color-border-strong)] rounded-xl flex items-center justify-center font-bold text-xl text-[var(--color-accent)] shadow-sm">
-            12
+          <div className="flex-1 bg-white border border-[var(--color-border-strong)] rounded-xl flex flex-col items-center justify-center py-4 shadow-sm">
+            <span className="font-bold text-3xl text-[var(--color-accent)]">12</span>
+            <span className="text-xs text-[var(--color-text-muted)] font-medium mt-1">Sessions</span>
           </div>
-          <div className="flex-1 h-20 bg-white border border-[var(--color-border-strong)] rounded-xl flex items-center justify-center font-bold text-xl text-[var(--color-accent)] shadow-sm">
-            5
+          <div className="flex-1 bg-white border border-[var(--color-border-strong)] rounded-xl flex flex-col items-center justify-center py-4 shadow-sm">
+            <span className="font-bold text-3xl text-[var(--color-accent)]">5</span>
+            <span className="text-xs text-[var(--color-text-muted)] font-medium mt-1">Companions</span>
           </div>
         </div>
-        <div className="w-full h-24 bg-white border border-[var(--color-border)] rounded-xl p-3 flex flex-col gap-2">
-          <div className="w-1/3 h-4 bg-[var(--color-border-strong)] rounded-full" />
-          <div className="w-full h-2 bg-[var(--color-bg-subtle)] rounded-full" />
-          <div className="w-2/3 h-2 bg-[var(--color-bg-subtle)] rounded-full" />
+        <div className="w-full bg-white border border-[var(--color-border)] rounded-xl p-4 flex flex-col gap-3 mt-2 shadow-sm">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-bold">Calculus Progress</span>
+            <span className="text-xs font-bold text-[var(--color-accent)]">85%</span>
+          </div>
+          <div className="w-full h-2 bg-[var(--color-bg-subtle)] rounded-full overflow-hidden">
+            <div className="w-[85%] h-full bg-[var(--color-primary)]" />
+          </div>
+          <p className="text-xs text-[var(--color-text-muted)] mt-1">Almost mastered Integration by Parts!</p>
         </div>
       </div>
     ),
